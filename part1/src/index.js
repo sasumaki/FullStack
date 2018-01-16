@@ -10,13 +10,14 @@ const Title = (props) => {
   )
 }
 const Content = (props) => {
+  console.log(props)
   return (
     <div>
-      <Part name = {props.part1.name} amount = {props.part1.exercises} />
-      <Part name = {props.part2.name} amount = {props.part2.exercises} />
-      <Part name = {props.part3.name} amount = {props.part3.exercises}/>
+      <Part name={props.parts[0].name} amount={props.parts[0].exercises} />
+      <Part name={props.parts[1].name} amount={props.parts[1].exercises} />
+      <Part name={props.parts[2].name} amount={props.parts[2].exercises} />
     </div>
-  ) 
+  )
 }
 const Part = (props) => {
   return (
@@ -29,30 +30,32 @@ const Part = (props) => {
 const Total = (props) => {
   return (
     <div>
-      <p>yhteensä {props.total} tehtävää </p>
+      <p>yhteensä {props.total[0].exercises+props.total[1].exercises+props.total[2].exercises} tehtävää </p>
     </div>
-  ) 
+  )
 }
 const App = () => {
   // const-määrittelyt
   const course = 'Half Stack -sovelluskehitys'
-  const part1 = {
-    name: 'Reactin perusteet',
-    exercises: 10
-  }
-  const part2 = {
-    name: 'Tiedonvälitys propseilla',
-    exercises: 7
-  }
-  const part3 = {
-    name: 'Komponenttien tila',
-    exercises: 14
-  }
+  const parts = [
+    {
+      name: 'Reactin perusteet',
+      exercises: 10
+    },
+    {
+      name: 'Tiedonvälitys propseilla',
+      exercises: 7
+    },
+    {
+      name: 'Komponenttien tila',
+      exercises: 14
+    }
+  ]
   return (
     <div>
       <Title course={course} />
-      <Content part1 = {part1} part2 ={part2} part3 = {part3}/>
-      <Total  total = {part1.exercises + part2.exercises + part3.exercises}/>
+      <Content parts={parts} />
+      <Total total={parts} />
     </div>
   )
 }
