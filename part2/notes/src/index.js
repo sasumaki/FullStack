@@ -1,69 +1,64 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
+import React from "react";
+import ReactDOM from "react-dom";
+import Course from "./components/Course";
 
+const Courses = ({ courses }) => {
+  return (
+    <div>
+      {courses.map(course => (
+        <Course key={course.id} name={course.name} parts={course.parts} />
+      ))}
+    </div>
+  );
+};
 
-const Title = (props) => {
-  return (
-    <div>
-      <h1>{props.course.name}</h1>
-    </div>
-  )
-}
-const Content = (props) => {
-  console.log(props)
-  return (
-    <div>
-      <Part name={props.course.parts[0].name} amount={props.course.parts[0].exercises} />
-      <Part name={props.course.parts[1].name} amount={props.course.parts[1].exercises} />
-      <Part name={props.course.parts[2].name} amount={props.course.parts[2].exercises} />
-      </div>
-  )
-}
-const Part = (props) => {
-  return (
-    <div>
-      <p>{props.name}, {props.amount}</p>
-    </div>
-  )
-}
-
-const Total = (props) => {
-  const sum = props.course.parts[0].exercises + props.course.parts[1].exercises + props.course.parts[2].exercises
-  return (
-    <div>
-      <p>yhteensä {sum} tehtävää </p>
-    </div>
-  )
-}
 const App = () => {
   // const-määrittelyt
-  const course = {
-    name: 'Half Stack -sovelluskehitys',
-    parts: [
-      {
-        name: 'Reactin perusteet',
-        exercises: 10
-      },
-      {
-        name: 'Tiedonvälitys propseilla',
-        exercises: 7
-      },
-      {
-        name: 'Komponenttien tila',
-        exercises: 14
-      }
-    ]
-  }
+  const courses = [
+    {
+      name: "Half Stack -sovelluskehitys",
+      id: 1,
+      parts: [
+        {
+          name: "Reactin perusteet",
+          exercises: 10,
+          id: 1
+        },
+        {
+          name: "Tiedonvälitys propseilla",
+          exercises: 7,
+          id: 2
+        },
+        {
+          name: "Komponenttien tila",
+          exercises: 14,
+          id: 3
+        }
+      ]
+    },
+    {
+      name: "Node.js",
+      id: 2,
+      parts: [
+        {
+          name: "Routing",
+          exercises: 3,
+          id: 1
+        },
+        {
+          name: "Middlewaret",
+          exercises: 7,
+          id: 2
+        }
+      ]
+    }
+  ];
+
   return (
     <div>
-      <Title course={course} />
-      <Content course={course} />
-      <Total course={course} />
+      <Courses courses={courses} />
     </div>
-  )
-}
+  );
+};
 
-ReactDOM.render(
-  <App />,
-  document.getElementById('root')
-)
+ReactDOM.render(<App />, document.getElementById("root"));
