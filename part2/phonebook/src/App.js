@@ -1,5 +1,6 @@
 import React from "react";
 import Person from "./components/Person";
+import contactService from "./services/Contacts";
 import axios from "axios";
 
 class App extends React.Component {
@@ -14,9 +15,9 @@ class App extends React.Component {
   }
   componentWillMount() {
     console.log("Getting data from http://localhost:3001/persons");
-    axios.get("http://localhost:3001/persons").then(response => {
+    contactService.getAll().then(response => {
+      this.setState({ persons: response });
       console.log("promise fulfilled");
-      this.setState({ persons: response.data });
     });
   }
   handleNameChange = event => {
@@ -33,8 +34,13 @@ class App extends React.Component {
     const person = { name: this.state.newName, number: this.state.newNumber };
     let names = this.state.persons.map(person => person.name);
     if (!names.includes(person.name)) {
-      let persons = this.state.persons.concat(person);
-      this.setState({ persons, newName: "", newNumber: "" });
+      contactService.create(person).then(response => {
+        this.setState({
+          persons: this.state.persons.concat(response),
+          newName: "",
+          newNumber: ""
+        });
+      });
     } else {
       alert("Contact already exists!");
     }
@@ -76,9 +82,9 @@ class App extends React.Component {
           <tbody>
             {contactsToShow.map(person => (
               <Person
-                key={person.name}
-                name={person.name}
-                number={person.number}
+                key={person.id}
+                person={person}
+                persons={this.state.persons}
               />
             ))}
           </tbody>
