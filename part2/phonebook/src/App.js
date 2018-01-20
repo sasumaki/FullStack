@@ -1,7 +1,7 @@
 import React from "react";
 import Person from "./components/Person";
+import Notification from "./components/Notification";
 import contactService from "./services/Contacts";
-import axios from "axios";
 
 class App extends React.Component {
   constructor(props) {
@@ -10,7 +10,8 @@ class App extends React.Component {
       persons: [],
       newName: "",
       newNumber: "",
-      filter: ""
+      filter: "",
+      error: null
     };
   }
   componentWillMount() {
@@ -29,20 +30,88 @@ class App extends React.Component {
   handleFilterChange = event => {
     this.setState({ filter: event.target.value });
   };
+  handleRemoval = (props, id) => {
+    return () => {
+      if (
+        window.confirm(`Are you sure you want to delete ${props.person.name}`)
+      ) {
+        contactService.remove(id).then(response => {
+          let remainingContacts = this.state.persons.filter(
+            person => person.id !== id
+          );
+          this.setState({
+            persons: remainingContacts,
+            error: `${props.person.name} deleted.`
+          });
+          setTimeout(() => {
+            this.setState({ error: null });
+          }, 5000);
+        });
+      }
+    };
+  };
   addEntry = event => {
     event.preventDefault();
-    const person = { name: this.state.newName, number: this.state.newNumber };
+    const newPerson = {
+      name: this.state.newName,
+      number: this.state.newNumber
+    };
     let names = this.state.persons.map(person => person.name);
-    if (!names.includes(person.name)) {
-      contactService.create(person).then(response => {
+    let numbers = this.state.persons.map(person => person.number);
+
+    if (!names.includes(newPerson.name)) {
+      contactService.create(newPerson).then(response => {
         this.setState({
           persons: this.state.persons.concat(response),
+          error: `${newPerson.name} added.`,
           newName: "",
           newNumber: ""
         });
+        setTimeout(() => {
+          this.setState({ error: null });
+        }, 5000);
       });
     } else {
-      alert("Contact already exists!");
+      let modified = this.state.persons.filter(p => {
+        return p.name === newPerson.name;
+      });
+      console.log(modified);
+      const newModifiedPerson = {
+        name: this.state.newName,
+        number: this.state.newNumber,
+        id: modified[0].id
+      };
+      if (
+        window.confirm(
+          `Are you sure you want to edit ${newModifiedPerson.name}?`
+        )
+      ) {
+        contactService
+          .update(modified[0].id, newPerson)
+          .then(response => {
+            console.log(response);
+            this.setState({
+              persons: this.state.persons.map(
+                person =>
+                  person.id !== modified[0].id ? person : newModifiedPerson
+              ),
+              error: `${newModifiedPerson.name} updated.`,
+              newName: "",
+              newNumber: ""
+            });
+            setTimeout(() => {
+              this.setState({ error: null });
+            }, 5000);
+          })
+          .catch(error => {
+            this.setState({
+              error: `${newModifiedPerson.name} already deleted`
+            });
+            setTimeout(() => {
+              this.setState({ error: null });
+            }, 5000);
+          });
+      }
     }
   };
   render() {
@@ -53,6 +122,7 @@ class App extends React.Component {
     return (
       <div>
         <h1>Phonebook</h1>
+        <Notification message={this.state.error} />
         <div>
           filter:{}
           <input value={this.state.filter} onChange={this.handleFilterChange} />
@@ -84,7 +154,7 @@ class App extends React.Component {
               <Person
                 key={person.id}
                 person={person}
-                persons={this.state.persons}
+                handler={this.handleRemoval}
               />
             ))}
           </tbody>
