@@ -3,6 +3,8 @@ const baseUrl = "/api/persons";
 
 const getAll = () => {
   const request = axios.get(baseUrl);
+  console.log(baseUrl);
+  console.log(request);
   return request.then(response => response.data).catch(error => {
     console.log("fail");
   });

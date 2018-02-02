@@ -14,8 +14,7 @@ class App extends React.Component {
       error: null
     };
   }
-  componentWillMount() {
-    console.log("Getting data from http://localhost:3001/persons");
+  componentDidMount() {
     contactService.getAll().then(response => {
       this.setState({ persons: response });
       console.log("promise fulfilled");
@@ -115,6 +114,8 @@ class App extends React.Component {
     }
   };
   render() {
+    console.log(this.state);
+
     const contactsToShow = this.state.persons.filter(person =>
       person.name.toLowerCase().includes(this.state.filter.toLowerCase())
     );
