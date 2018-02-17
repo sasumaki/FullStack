@@ -1,2 +1,4 @@
 */node_modules
 */.env
+part4/blog/.env
+part4/blog/node_modules/*
