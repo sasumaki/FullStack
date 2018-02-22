@@ -2,7 +2,8 @@ POST http://localhost:3003/api/blogs
 content-type: application/json
 
 {
+  "title":"blabal",
   "author": "Purge",
   "url": "www.dota2.com",
-  "likes": 322
+  "likes":32
 }
