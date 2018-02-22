@@ -2,7 +2,8 @@ const supertest = require('supertest')
 const { app, server } = require('../index')
 const api = supertest(app)
 const Blog = require('../models/Blog')
-const { initialBlogs, format, blogsInDb } = require('./test_helper')
+const User = require('../models/User')
+const { initialBlogs, format, blogsInDb, usersInDb } = require('./test_helper')
 
 beforeAll(async () => {
   await Blog.remove({})
@@ -174,6 +175,99 @@ describe('update a blog', async () => {
     expect(blogsAfterOperation.length).toBe(blogsAtStart.length)
     expect(blogsAfterOperation.find(o => o.title === 'UPDATE THIS').likes).toBe(
       newBlog.likes
+    )
+  })
+})
+describe('only one user in db tests', async () => {
+  beforeAll(async () => {
+    await User.remove({})
+    const user = new User({ username: 'root', password: 'idinahui' })
+    await user.save()
+  })
+
+  test('POST /api/users succeeds with a fresh username', async () => {
+    const usersBeforeOperation = await usersInDb()
+
+    const newUser = {
+      username: 'Cykablyat',
+      name: 'Vladislav Agerev',
+      password: 'plöööö666'
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAfterOperation = await usersInDb()
+    expect(usersAfterOperation.length).toBe(usersBeforeOperation.length + 1)
+    const usernames = usersAfterOperation.map(u => u.username)
+    expect(usernames).toContain(newUser.username)
+  })
+
+  test('POST /api/users fails with proper statuscode and message if username already taken', async () => {
+    const usersBeforeOperation = await usersInDb()
+
+    const newUser = {
+      username: 'root',
+      name: 'Adolf Hitler',
+      password: 'fghjgfdrg'
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body).toEqual({ error: 'username must be unique' })
+
+    const usersAfterOperation = await usersInDb()
+    expect(usersAfterOperation.length).toBe(usersBeforeOperation.length)
+  })
+  test('POST /api/users fails with proper statuscode and message if password is too small', async () => {
+    const usersBeforeOperation = await usersInDb()
+
+    const newUser = {
+      username: 'MargStar',
+      name: 'Margaret Thatcher',
+      password: '69',
+      adult: 1
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body).toEqual({
+      error: 'Password must be atleast 3 characters long'
+    })
+
+    const usersAfterOperation = await usersInDb()
+    expect(usersAfterOperation.length).toBe(usersBeforeOperation.length)
+  })
+  test('POST /api/users succeeds without adult field as true', async () => {
+    const usersBeforeOperation = await usersInDb()
+
+    const newUser = {
+      username: 'Arteezy',
+      name: 'Artour Babaev',
+      password: 'MLG-Columbus'
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAfterOperation = await usersInDb()
+    expect(usersAfterOperation.length).toBe(usersBeforeOperation.length + 1)
+    expect(usersAfterOperation.find(o => o.username === 'Arteezy').adult).toBe(
+      true
     )
   })
 })
