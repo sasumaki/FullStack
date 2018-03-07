@@ -3,3 +3,4 @@
 part4/blog/.env
 part4/blog/node_modules/*
 /part6/redux-anecdotes-v2/node_modules
+/part6/routed-anecdotes/node_modules

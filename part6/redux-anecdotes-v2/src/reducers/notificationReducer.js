@@ -6,9 +6,17 @@ const reducer = (state = initialState, action) => {
   }
   return state
 }
-export const notify = content => {
-  console.log('called notify ', content)
-  return { type: 'NOTIFICATION', content: content }
+export const notify = (content, time) => {
+  return async dispatch => {
+    dispatch({
+      type: 'NOTIFICATION',
+      content
+    })
+    setTimeout(
+      () => dispatch({ type: 'NOTIFICATION', content: '' }),
+      time * 1000
+    )
+  }
 }
 
 export default reducer

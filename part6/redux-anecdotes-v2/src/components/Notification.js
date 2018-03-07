@@ -1,5 +1,5 @@
 import React from 'react'
-
+import { connect } from 'react-redux'
 class Notification extends React.Component {
   render() {
     const style = {
@@ -7,8 +7,8 @@ class Notification extends React.Component {
       padding: 10,
       borderWidth: 1
     }
-    let notification = this.props.store.getState().notifications
-    console.log(notification)
+
+    let notification = this.props.notification
     return (
       <div style={style}>
         <p> {notification}</p>
@@ -16,5 +16,10 @@ class Notification extends React.Component {
     )
   }
 }
+const mapStateToProps = state => {
+  return {
+    notification: state.notifications
+  }
+}
 
-export default Notification
+export default connect(mapStateToProps)(Notification)
